@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Toronto Bikeshare Station Info</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <script src="js/maplibre-gl.js"></script>
+  <link rel="stylesheet" href="css/maplibre-gl.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <style>
+    #map {position: absolute; top: 0; right: 0; bottom: 0; left: 0;}
+    .popup {text-align: center;}
+    .title {
+      display: table;
+      position: relative;
+      margin: 0px auto;
+      word-wrap: anywhere;
+      white-space: pre-wrap;
+      padding: 10px;
+      border: none;
+      border-radius: 3px;
+      font-size: 24px;
+      text-align: center;
+      color: #222;
+      background: #fff;
+    }
+    .legend {
+      background-color: #fff;
+      border-radius: 3px;
+      bottom: 30px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      font: 16px/24px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+      padding: 10px;
+      position: absolute;
+      right: 10px;
+      z-index: 1;
+    }
+    .legend div span {
+        border-radius: 50%;
+        display: inline-block;
+        height: 10px;
+        margin-right: 5px;
+        width: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map">
+    <a href="https://www.maptiler.com" style="position:absolute;left:10px;bottom:10px;z-index:999;"><img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo"></a>
+  </div>
+
+  <div id="title" class="title"></div>
+
+  <div id="legend" class="legend">
+    <div id="count"></div>
+    <div><span style="background-color: #e41a1c"></span>Charging Station</div>
+    <div><span style="background-color: #377eb8"></span>Regular Station</div>
+  </div>
+  <script>
+    // Add a title
+    $(document).ready(function(){
+        $('#title').html(
+          "<b>Bike Share Toronto Station Info</b><br>" +
+          "Created by <a href='https://zehuiyin.github.io' target='_blank'>Zehui Yin</a> </br>" 
+        )
+    });
+    
+    // Initialize map
+    let map = new maplibregl.Map({
+      container: 'map',
+      style: 'https://api.maptiler.com/maps/backdrop/style.json?key=HKgQAIheuh9EKnXWzGiC',
+      center: [-79.38938976075372, 43.66790360528638],
+      zoom: 12,
+      pitch: 0,
+      bearing: -18.2
+    });
+
+    let jsondata
+    let gj = {
+      "name":"Bikeshare",
+      "type":"FeatureCollection",
+      "features":[]
+    };
+
+    function populate_gj(jsondata) {
+      jsondata.data.stations.forEach(function(e) {
+        gj.features.push({"type": "Feature",
+        "geometry":{
+          "type": "Point", 
+          "coordinates": [e.lon*1, e.lat*1]},
+        "properties":{
+          "ID": e.station_id,
+          "Address": e.address,
+          "Capacity": e.capacity,
+          "Charging": String(e.is_charging_station)
+        }
+      })
+      })
+    }
+
+    fetch("https://tor.publicbikesystem.net/ube/gbfs/v1/en/station_information")
+	  .then(function(response) {
+      return response.json()
+	  })
+    .then(function(js){
+      jsondata = js
+    })
+    .then(function(){
+      populate_gj(jsondata)
+      // populate legend
+      document.getElementById("count").innerHTML = "<b>There are currently " +
+        String(gj.features.length) +
+        " Stations in Toronto </b>"
+    })
+
+    // Add GeoJSON layer
+    map.on('load', function() {
+      map.addControl(new maplibregl.NavigationControl());
+      map.addSource('bikeshare_data', {
+        'type': 'geojson',
+        'data': gj
+      });
+
+      map.addLayer({
+        'id': 'bikeshare_point',
+        'source': 'bikeshare_data',
+        'type': 'circle',
+        'paint': {
+            'circle-radius': {
+                'base': 1.75, // control interpolate changing rate, more toward higher end
+                'stops': [
+		  [2, 2],
+                  [12, 7], // zoom level 12, circle radius 7
+                  [22, 240]
+                ]
+             },
+            'circle-color': [
+              'match',
+              ['get', 'Charging'],
+              "true", "#e41a1c",
+              "false", "#377eb8",
+              /* other */ "grey"
+            ]
+        }
+    });
+
+      // Display popups on click
+      map.on('click', 'bikeshare_point', function(e) {
+        let coordinates = e.lngLat;
+        let description = 
+          '<div class="popup">' + 
+          'Station ID: ' + e.features[0].properties.ID + "<br>" + 
+          'Address: ' + e.features[0].properties.Address + "<br>" +
+          'Capacity: ' + Math.round(e.features[0].properties.Capacity) +
+          '</div>';
+        new maplibregl.Popup()
+          .setLngLat(coordinates)
+          .setHTML(description)
+          .addTo(map);
+      });
+    });
+
+  </script>
+</body>
+</html>
