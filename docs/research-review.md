@@ -24,7 +24,7 @@ Grades: 1 = absent, 3 = adequate, 5 = publication grade.
 - Added `.github/workflows/pages.yml` and `.gitignore` entries for site build output.
 - Attribution: README now states the project derives from Zehui Yin's MIT map and keeps the copyright line; the legacy map's title box credited only "Jesun" with a broken link (`https://jesunahmadushno`) and now credits the original author with working links.
 - README copy error "bus markers" corrected to "station markers"; run-locally steps added.
-- Data quirks documented on the dashboard, computed from the data: post_code missing on 296 stations, is_valet_station present on 15, altitude 0.0 or null on all but one station, and nearby_distance values of 16,093.4 m (6 stations) and 17,702.74 m (1), which are about 10 and 11 miles.
+- Data quirks documented on the dashboard, computed from the data: post_code missing on 296 stations, is_valet_station present on 15, altitude 0.0 or null on all but two stations (662 at 0.0, 10 null; Church St / Wood St reads 102.08 and Oak St / Sackville St reads 10.0), and nearby_distance values of 16,093.4 m (6 stations) and 17,702.74 m (1), which are about 10 and 11 miles.
 
 ## Threats to validity
 
