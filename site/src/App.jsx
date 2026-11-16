@@ -90,7 +90,7 @@ export default function App() {
   const [sel, setSel] = useState(() => Math.max(0, ST.findIndex((s) => s.name.startsWith('Union Station'))));
   const [r, setR] = useState(300);
   return (
-    <div className="wrap">
+    <div className="wrap"><a className="skip" href="#top">Skip to content</a>
       <MenuBar />
       <div className="glow" aria-hidden="true" />
       <Hero />
@@ -103,14 +103,14 @@ export default function App() {
       <Dock />
       <footer>
         Data: Bike Share Toronto GBFS <code>station_information</code> feed, recorded {SNAP_LABEL} and committed as <code>{SNAP_FILE}</code>. Every number on this page is computed in your browser from that file; nothing here is live.
-      </footer>
+      <nav className="support" aria-label="Support this work"><a href="https://github.com/sponsors/JesunAhmadUshno">Sponsor this work</a><a href="https://github.com/sponsors/JesunAhmadUshno">Donate</a><a href="https://buymeacoffee.com/jesun">Buy Me a Coffee</a><a href="https://calendly.com/jesunahmadushno/30min">Work with me</a></nav></footer>
     </div>
   );
 }
 
 function Hero() {
   return (
-    <header className="card hero window" id="top" data-title="toronto_bikeshare — README">
+    <header className="card hero window" id="top" data-title="toronto_bikeshare - README">
       <div className="head">
         <p className="eyebrow">GBFS station snapshot · {SNAP_DAY}</p>
         <span className="pill info">● Recorded snapshot, not live</span>
@@ -159,7 +159,7 @@ function StationMap({ sel, setSel, r }) {
   const docks = shown.reduce((t, [s]) => t + s.capacity, 0);
   const focus = ST[hover ?? sel];
   return (
-    <section id="map" className="card window reveal" data-title="stations.geojson — recorded snapshot">
+    <section id="map" className="card window reveal" data-title="stations.geojson - recorded snapshot">
       <div className="head">
         <div>
           <p className="eyebrow">Station explorer</p>
@@ -221,7 +221,7 @@ function Coverage({ sel, setSel, r, setR }) {
   const cx = (v) => pad.l + ((v - 50) / 950) * (W - pad.l - pad.r);
   const cy = (v) => pad.t + (1 - v) * (H - pad.t - pad.b);
   return (
-    <section id="coverage" className="card window reveal" data-title="coverage.calc — live haversine">
+    <section id="coverage" className="card window reveal" data-title="coverage.calc - live haversine">
       <p className="eyebrow">Walking-coverage calculator · computed live</p>
       <h2>At {r} m, {pct(share)} of stations have another one in reach.</h2>
       <p className="sub">
@@ -362,7 +362,7 @@ function Audit() {
   const altZero = ST.filter((s) => s.altitude === 0).length, altNull = ST.filter((s) => s.altitude == null).length;
   const sparse = fields.filter(([, n]) => n < S.stations);
   return (
-    <section id="audit" className="card window reveal" data-title="gbfs_audit.txt — computed from the snapshot">
+    <section id="audit" className="card window reveal" data-title="gbfs_audit.txt - computed from the snapshot">
       <p className="eyebrow">Data quality</p>
       <h2>The feed is complete where it matters and patchy everywhere else.</h2>
       <p className="sub">
@@ -403,7 +403,7 @@ function About() {
     ['LICENSE', 'Licence', 'MIT, Zehui Yin 2023'],
   ];
   return (
-    <section id="about" className="card window reveal" data-title="Terminal — npm run build">
+    <section id="about" className="card window reveal" data-title="Terminal - npm run build">
       <p className="eyebrow">Provenance, limits and reproduction</p>
       <h2>One file in, every number out. Here is what it can and cannot tell you.</h2>
       <div className="grid2" style={{ marginTop: 16 }}>
